@@ -37,4 +37,16 @@ contract CrowdFunding is ICrowdFunding {
     function claim(uint256 campaignId) external {}
 
     function refund(uint256 campaignId) external {}
+
+    function getCampaignById(
+        uint256 campaignId
+    ) public view returns (Campaign memory) {
+        Campaign memory matchedCampaign = campaignIdToCampaignData[campaignId];
+
+        if (matchedCampaign.creator == address(0)) {
+            revert CrowdFund__NoMatchingCampaign();
+        }
+
+        return matchedCampaign;
+    }
 }
