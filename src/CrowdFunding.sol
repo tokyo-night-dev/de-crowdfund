@@ -5,7 +5,7 @@ import {ICrowdFunding} from "./ICrowdFunding.sol";
 
 contract CrowdFunding is ICrowdFunding {
     mapping(uint256 => Campaign) campaignIdToCampaignData;
-    uint256 campaignId = 0;
+    uint256 s_campaignId = 0;
 
     function launch(
         uint256 targetAmount,
@@ -27,9 +27,9 @@ contract CrowdFunding is ICrowdFunding {
             claimed: false
         });
 
-        campaignId++;
-        campaignIdToCampaignData[campaignId] = campaignToBeLaunched;
-        return campaignId;
+        s_campaignId++;
+        campaignIdToCampaignData[s_campaignId] = campaignToBeLaunched;
+        return s_campaignId;
     }
 
     function pledge(uint256 campaignId) external payable {}
