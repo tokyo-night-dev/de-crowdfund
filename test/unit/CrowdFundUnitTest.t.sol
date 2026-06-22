@@ -24,4 +24,15 @@ contract CrowdFundUnitTest is Test {
         vm.expectRevert(ICrowdFunding.CrowdFund__DeadLineMustBeFuture.selector);
         crowdFunding.launch(1 ether, block.timestamp - 1000);
     }
+
+    function testNoMatchingCampaign() public {
+        vm.warp(10000);
+        uint256 campaignId = crowdFunding.launch(
+            2 ether,
+            block.timestamp + 10000
+        );
+
+        vm.expectRevert(ICrowdFunding.CrowdFund__NoMatchingCampaign.selector);
+        crowdFunding.getCampaignById(campaignId + 1);
+    }
 }
