@@ -23,6 +23,7 @@ interface ICrowdFunding {
     error CrowdFund__TargetNotMet();
     error CrowdFund__TargetAlreadyMet();
     error CrowdFund__TransferFailed();
+    error CrowdFund__NoMatchingCampaign();
 
     struct Campaign {
         address creator;
