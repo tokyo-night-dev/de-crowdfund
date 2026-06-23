@@ -18,6 +18,7 @@ interface ICrowdFunding {
      */
     error CrowdFund__InvalidTargetAmount();
     error CrowdFund__DeadLineMustBeFuture();
+    error CrowdFund__MoreThanZeroPledge();
     error CrowdFund__CampaignExpired();
     error CrowdFund__CampaignNotEnded();
     error CrowdFund__TargetNotMet();
