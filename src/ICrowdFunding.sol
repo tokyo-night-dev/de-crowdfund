@@ -13,11 +13,27 @@ pragma solidity ^0.8.20;
 
 interface ICrowdFunding {
     /**
+     * Custom Events
+     */
+    event LaunchCrowdFund(
+        address indexed creator,
+        uint256 indexed campaignId,
+        uint256 targetAmount
+    );
+
+    event PledgeFund(
+        address indexed user,
+        uint256 indexed campaignId,
+        uint256 fundedAmount
+    );
+
+    /**
      * Custom Errors
      * Define Errors based on functions.
      */
     error CrowdFund__InvalidTargetAmount();
     error CrowdFund__DeadLineMustBeFuture();
+    error CrowdFund__MoreThanZeroPledge();
     error CrowdFund__CampaignExpired();
     error CrowdFund__CampaignNotEnded();
     error CrowdFund__TargetNotMet();
