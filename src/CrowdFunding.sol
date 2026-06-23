@@ -30,6 +30,9 @@ contract CrowdFunding is ICrowdFunding {
 
         s_campaignId++;
         campaignIdToCampaignData[s_campaignId] = campaignToBeLaunched;
+
+        emit LaunchCrowdFund(msg.sender, s_campaignId, targetAmount);
+
         return s_campaignId;
     }
 
@@ -66,7 +69,8 @@ contract CrowdFunding is ICrowdFunding {
             userRefundAmount = msg.value - actualUserFundingAmount;
         }
 
-        campaignIdToCampaignData[campaignId].currentAmount += actualUserFundingAmount;
+        campaignIdToCampaignData[campaignId]
+            .currentAmount += actualUserFundingAmount;
         campaignIdToUserToFundedAmount[campaignId][
             msg.sender
         ] += actualUserFundingAmount;
@@ -79,6 +83,8 @@ contract CrowdFunding is ICrowdFunding {
                 revert CrowdFund__TransferFailed();
             }
         }
+
+        emit PledgeFund(msg.sender, campaignId, actualUserFundingAmount);
     }
 
     function claim(uint256 campaignId) external {}
