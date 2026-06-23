@@ -25,6 +25,15 @@ contract CrowdFundUnitTest is Test {
         crowdFunding.launch(1 ether, block.timestamp - 1000);
     }
 
+    function testEmitLaunchEvent() public {
+        address alice = makeAddr('alice');
+        vm.prank(alice);
+
+        vm.expectEmit(true, true, false, true);
+        emit ICrowdFunding.LaunchCrowdFund(alice, 1, 10 ether);
+        crowdFunding.launch(10 ether, block.timestamp + 100000);
+    }
+
     function testNoMatchingCampaign() public {
         vm.warp(10000);
         uint256 campaignId = crowdFunding.launch(
@@ -137,5 +146,23 @@ contract CrowdFundUnitTest is Test {
         crowdFunding.pledge{value: SECOND_SENDING_ETH}(campaignId);
 
         assertEq(user.balance, 0.8 ether);
+    }
+
+    function testEmitPledgeEvent() public {
+        vm.warp(10000);
+
+        uint256 campaignId = crowdFunding.launch(
+            3 ether,
+            block.timestamp + 10000000
+        );
+
+        address user = makeAddr("user");
+        hoax(user, 10 ether);
+
+        uint256 SENDING_ETH = 3 ether;
+
+        vm.expectEmit(true, true, false, true);
+        emit ICrowdFunding.PledgeFund(user, campaignId, 3 ether);
+        crowdFunding.pledge{value: SENDING_ETH}(campaignId);
     }
 }
