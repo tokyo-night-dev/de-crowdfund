@@ -103,7 +103,7 @@ contract CrowdFunding is ICrowdFunding {
         }
 
         uint256 fundedAmount = matchedCampaign.currentAmount;
-        delete campaignIdToCampaignData[campaignId];
+        campaignIdToCampaignData[campaignId].claimed = true;
 
         (bool success, ) = payable(msg.sender).call{value: fundedAmount}("");
 
