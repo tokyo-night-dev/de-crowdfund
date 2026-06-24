@@ -87,7 +87,32 @@ contract CrowdFunding is ICrowdFunding {
         emit PledgeFund(msg.sender, campaignId, actualUserFundingAmount);
     }
 
-    function claim(uint256 campaignId) external {}
+    function claim(uint256 campaignId) external {
+        Campaign memory matchedCampaign = campaignIdToCampaignData[campaignId];
+
+        if (matchedCampaign.creator != msg.sender) {
+            revert CrowdFund__NotCampaignOwner();
+        }
+
+        if (matchedCampaign.deadLine > block.timestamp) {
+            revert CrowdFund__CampaignNotEnded();
+        }
+
+        if (matchedCampaign.currentAmount < matchedCampaign.targetAmount) {
+            revert CrowdFund__TargetNotMet();
+        }
+
+        uint256 fundedAmount = matchedCampaign.currentAmount;
+        delete campaignIdToCampaignData[campaignId];
+
+        (bool success, ) = payable(msg.sender).call{value: fundedAmount}("");
+
+        if (!success) {
+            revert CrowdFund__TransferFailed();
+        }
+
+        emit Claim(msg.sender, campaignId, fundedAmount);
+    }
 
     function refund(uint256 campaignId) external {}
 
