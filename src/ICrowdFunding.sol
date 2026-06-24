@@ -33,6 +33,12 @@ interface ICrowdFunding {
         uint256 fundedAmount
     );
 
+    event Refund(
+        address indexed user,
+        uint256 indexed campaignId,
+        uint256 refundAmount
+    );
+
     /**
      * Custom Errors
      * Define Errors based on functions.
@@ -48,6 +54,8 @@ interface ICrowdFunding {
     error CrowdFund__NoMatchingCampaign();
     error CrowdFund__AlreadyClaimed();
     error CrowdFund__NotCampaignOwner();
+    error CrowdFund__NotBackerForThisCampaign();
+    error CrowdFund__CampaignInProgress();
 
     struct Campaign {
         address creator;
