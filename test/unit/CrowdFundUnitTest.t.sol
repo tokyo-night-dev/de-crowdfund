@@ -219,7 +219,7 @@ contract CrowdFundUnitTest is Test {
         crowdFunding.claim(campaignId);
     }
 
-    function testIfCampaignDeletedAfterClaiming() public {
+    function testIfCampaignClaimedAfterClaiming() public {
         address owner = makeAddr("owner");
         vm.prank(owner);
         vm.warp(10000);
@@ -239,8 +239,10 @@ contract CrowdFundUnitTest is Test {
         vm.prank(owner);
         crowdFunding.claim(campaignId);
 
-        vm.expectRevert(ICrowdFunding.CrowdFund__NoMatchingCampaign.selector);
-        crowdFunding.getCampaignById(campaignId);
+        ICrowdFunding.Campaign memory campaign = crowdFunding.getCampaignById(
+            campaignId
+        );
+        assertEq(campaign.claimed, true);
     }
 
     function testIfGotFundAmountAftetClaiming() public {
