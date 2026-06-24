@@ -291,4 +291,169 @@ contract CrowdFundUnitTest is Test {
         emit ICrowdFunding.Claim(owner, campaignId, 20 ether);
         crowdFunding.claim(campaignId);
     }
+
+    /**
+     * Refund Unit Test
+     */
+    function testNotBackerWhenRefund() public {
+        vm.warp(10000);
+        address alice = makeAddr("alice");
+        vm.prank(alice);
+
+        uint256 campaignId = crowdFunding.launch(
+            1 ether,
+            block.timestamp + 20000
+        );
+
+        address user = makeAddr("user");
+        hoax(user, 0.2 ether);
+        crowdFunding.pledge{value: user.balance}(campaignId);
+
+        address bob = makeAddr("bob");
+        vm.prank(bob);
+        vm.warp(40000);
+        vm.expectRevert(
+            ICrowdFunding.CrowdFund__NotBackerForThisCampaign.selector
+        );
+        crowdFunding.refund(campaignId);
+    }
+
+    function testCampaignInProgressWhenRefund() public {
+        vm.warp(10000);
+        address alice = makeAddr("alice");
+        vm.prank(alice);
+
+        uint256 campaignId = crowdFunding.launch(
+            1 ether,
+            block.timestamp + 10000000
+        );
+
+        address user = makeAddr("user");
+        hoax(user, 1 ether);
+        crowdFunding.pledge{value: user.balance}(campaignId);
+
+        vm.prank(user);
+        vm.expectRevert(ICrowdFunding.CrowdFund__CampaignInProgress.selector);
+        crowdFunding.refund(campaignId);
+    }
+
+    function testTargetAlreadyMetWhenRefund() public {
+        vm.warp(10000);
+        address alice = makeAddr("alice");
+        vm.prank(alice);
+
+        uint256 campaignId = crowdFunding.launch(
+            1 ether,
+            block.timestamp + 10000
+        );
+
+        address user = makeAddr("user");
+        hoax(user, 1 ether);
+        crowdFunding.pledge{value: user.balance}(campaignId);
+
+        vm.prank(user);
+        vm.warp(30000);
+        vm.expectRevert(ICrowdFunding.CrowdFund__TargetAlreadyMet.selector);
+        crowdFunding.refund(campaignId);
+    }
+
+    function testAlreadyClaimedWhenRefund() public {
+        address owner = makeAddr("owner");
+        vm.prank(owner);
+        vm.warp(10000);
+
+        uint256 campaignId = crowdFunding.launch(
+            20 ether,
+            block.timestamp + 10000
+        );
+
+        address user = makeAddr("user");
+        hoax(user, 100 ether);
+
+        crowdFunding.pledge{value: user.balance}(campaignId);
+
+        vm.warp(30000);
+
+        vm.prank(owner);
+        crowdFunding.claim(campaignId);
+
+        vm.prank(user);
+        vm.expectRevert(ICrowdFunding.CrowdFund__AlreadyClaimed.selector);
+        crowdFunding.refund(campaignId);
+    }
+
+    function testUserFundedAmountIsZeroAfterRefund() public {
+        address owner = makeAddr("owner");
+        vm.prank(owner);
+        vm.warp(10000);
+
+        uint256 campaignId = crowdFunding.launch(
+            1000 ether,
+            block.timestamp + 10000
+        );
+
+        address user = makeAddr("user");
+        hoax(user, 100 ether);
+
+        crowdFunding.pledge{value: user.balance}(campaignId);
+
+        vm.warp(30000);
+
+        vm.prank(user);
+        crowdFunding.refund(campaignId);
+
+        uint256 userFundedAmount = crowdFunding.getUserFundedAmountById(
+            campaignId,
+            user
+        );
+
+        assertEq(userFundedAmount, 0);
+    }
+
+    function testUserBalanceAfterRefund() public {
+        address owner = makeAddr("owner");
+        vm.prank(owner);
+        vm.warp(10000);
+
+        uint256 campaignId = crowdFunding.launch(
+            1000 ether,
+            block.timestamp + 10000
+        );
+
+        address user = makeAddr("user");
+        hoax(user, 100 ether);
+
+        crowdFunding.pledge{value: 20 ether}(campaignId);
+
+        vm.warp(30000);
+
+        vm.prank(user);
+        crowdFunding.refund(campaignId);
+
+        assertEq(user.balance, 100 ether);
+    }
+
+    function testRefundEvent() public {
+        address owner = makeAddr("owner");
+        vm.prank(owner);
+        vm.warp(10000);
+
+        uint256 campaignId = crowdFunding.launch(
+            1000 ether,
+            block.timestamp + 10000
+        );
+
+        address user = makeAddr("user");
+        hoax(user, 100 ether);
+
+        crowdFunding.pledge{value: 20 ether}(campaignId);
+
+        vm.warp(30000);
+
+        vm.prank(user);
+
+        vm.expectEmit(true, true, false, true);
+        emit ICrowdFunding.Refund(user, campaignId, 20 ether);
+        crowdFunding.refund(campaignId);
+    }
 }
