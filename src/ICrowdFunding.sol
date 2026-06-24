@@ -46,6 +46,7 @@ interface ICrowdFunding {
     error CrowdFund__TargetAlreadyMet();
     error CrowdFund__TransferFailed();
     error CrowdFund__NoMatchingCampaign();
+    error CrowdFund__AlreadyClaimed();
     error CrowdFund__NotCampaignOwner();
 
     struct Campaign {
