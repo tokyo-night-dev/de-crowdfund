@@ -5,6 +5,7 @@ const DEFAULT_ANVIL_RPC_URL = "http://127.0.0.1:8545";
 
 export const config = createConfig({
   chains: [sepolia, anvil],
+  ssr: true,
   transports: {
     [sepolia.id]: http(),
     [anvil.id]: http(DEFAULT_ANVIL_RPC_URL),
