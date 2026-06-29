@@ -171,4 +171,14 @@ contract CrowdFunding is ICrowdFunding {
         ];
         return userFundedAmount;
     }
+
+    function getAllCampaigns() public view returns (Campaign[] memory) {
+        Campaign[] memory campaigns = new Campaign[](s_campaignId);
+
+        for (uint256 i = 1; i <= s_campaignId; i++) {
+            Campaign memory campaign = campaignIdToCampaignData[i];
+            campaigns[i-1] = campaign;
+        }
+        return campaigns;
+    }
 }
