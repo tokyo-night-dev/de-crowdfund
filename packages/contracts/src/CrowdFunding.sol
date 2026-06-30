@@ -10,7 +10,9 @@ contract CrowdFunding is ICrowdFunding {
 
     function launch(
         uint256 targetAmount,
-        uint256 deadLine
+        uint256 deadLine,
+        string memory title,
+        string memory description
     ) external returns (uint256 campaignId) {
         if (targetAmount <= 0) {
             revert CrowdFund__InvalidTargetAmount();
@@ -20,18 +22,28 @@ contract CrowdFunding is ICrowdFunding {
             revert CrowdFund__DeadLineMustBeFuture();
         }
 
+        if (bytes(title).length == 0) {
+            revert CrowdFund__MustHaveTitle();
+        }
+
+        if (bytes(description).length == 0) {
+            revert CrowdFund__MustHaveDescription();
+        }
+
         Campaign memory campaignToBeLaunched = Campaign({
             creator: msg.sender,
             targetAmount: targetAmount,
             deadLine: deadLine,
             currentAmount: 0,
-            claimed: false
+            claimed: false,
+            title: title,
+            description: description
         });
 
         s_campaignId++;
         campaignIdToCampaignData[s_campaignId] = campaignToBeLaunched;
 
-        emit LaunchCrowdFund(msg.sender, s_campaignId, targetAmount);
+        emit LaunchCrowdFund(msg.sender, s_campaignId, title, targetAmount);
 
         return s_campaignId;
     }
@@ -177,7 +189,7 @@ contract CrowdFunding is ICrowdFunding {
 
         for (uint256 i = 1; i <= s_campaignId; i++) {
             Campaign memory campaign = campaignIdToCampaignData[i];
-            campaigns[i-1] = campaign;
+            campaigns[i - 1] = campaign;
         }
         return campaigns;
     }
