@@ -1,4 +1,3 @@
-import { metaMask } from "@wagmi/connectors";
 import { createConfig, http, injected } from "@wagmi/core";
 import { sepolia, anvil } from "viem/chains";
 
