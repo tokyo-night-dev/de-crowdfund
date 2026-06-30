@@ -8,6 +8,8 @@ import {DeployCrowdFunding} from "../../script/DeployCrowdFunding.s.sol";
 
 contract CrowdFundUnitTest is Test {
     CrowdFunding crowdFunding;
+    string constant TITLE = "TITLE";
+    string constant DESCRIPTION = "DESCRIPTION";
 
     function setUp() public {
         DeployCrowdFunding deployer = new DeployCrowdFunding();
@@ -16,13 +18,28 @@ contract CrowdFundUnitTest is Test {
 
     function testRevertInvalidTargetAmount() public {
         vm.expectRevert(ICrowdFunding.CrowdFund__InvalidTargetAmount.selector);
-        crowdFunding.launch(0, 1000);
+        crowdFunding.launch(0, 1000, TITLE, DESCRIPTION);
     }
 
     function testIfDeadLineNotFuture() public {
         vm.warp(10000);
         vm.expectRevert(ICrowdFunding.CrowdFund__DeadLineMustBeFuture.selector);
-        crowdFunding.launch(1 ether, block.timestamp - 1000);
+        crowdFunding.launch(
+            1 ether,
+            block.timestamp - 1000,
+            TITLE,
+            DESCRIPTION
+        );
+    }
+
+    function testIfTitleExists() public {
+        vm.expectRevert(ICrowdFunding.CrowdFund__MustHaveTitle.selector);
+        crowdFunding.launch(10 ether, 1000, "", DESCRIPTION);
+    }
+
+    function testIfDescriptionExists() public {
+        vm.expectRevert(ICrowdFunding.CrowdFund__MustHaveDescription.selector);
+        crowdFunding.launch(10 ether, 1000, TITLE, "");
     }
 
     function testEmitLaunchEvent() public {
@@ -30,15 +47,22 @@ contract CrowdFundUnitTest is Test {
         vm.prank(alice);
 
         vm.expectEmit(true, true, false, true);
-        emit ICrowdFunding.LaunchCrowdFund(alice, 1, 10 ether);
-        crowdFunding.launch(10 ether, block.timestamp + 100000);
+        emit ICrowdFunding.LaunchCrowdFund(alice, 1, TITLE, 10 ether);
+        crowdFunding.launch(
+            10 ether,
+            block.timestamp + 100000,
+            TITLE,
+            DESCRIPTION
+        );
     }
 
     function testNoMatchingCampaign() public {
         vm.warp(10000);
         uint256 campaignId = crowdFunding.launch(
             2 ether,
-            block.timestamp + 10000
+            block.timestamp + 10000,
+            TITLE,
+            DESCRIPTION
         );
 
         vm.expectRevert(ICrowdFunding.CrowdFund__NoMatchingCampaign.selector);
@@ -59,7 +83,9 @@ contract CrowdFundUnitTest is Test {
         vm.warp(10000);
         uint256 campaignId = crowdFunding.launch(
             1 ether,
-            block.timestamp + 10000
+            block.timestamp + 10000,
+            TITLE,
+            DESCRIPTION
         );
 
         vm.warp(30000);
@@ -71,7 +97,9 @@ contract CrowdFundUnitTest is Test {
         vm.warp(10000);
         uint256 campaignId = crowdFunding.launch(
             3 ether,
-            block.timestamp + 10000000
+            block.timestamp + 10000000,
+            TITLE,
+            DESCRIPTION
         );
 
         address user = makeAddr("user");
@@ -91,7 +119,9 @@ contract CrowdFundUnitTest is Test {
 
         uint256 campaignId = crowdFunding.launch(
             3 ether,
-            block.timestamp + 10000000
+            block.timestamp + 10000000,
+            TITLE,
+            DESCRIPTION
         );
 
         address user = makeAddr("user");
@@ -112,7 +142,9 @@ contract CrowdFundUnitTest is Test {
 
         uint256 campaignId = crowdFunding.launch(
             1 ether,
-            block.timestamp + 10000000
+            block.timestamp + 10000000,
+            TITLE,
+            DESCRIPTION
         );
 
         address user = makeAddr("user");
@@ -131,7 +163,9 @@ contract CrowdFundUnitTest is Test {
 
         uint256 campaignId = crowdFunding.launch(
             1 ether,
-            block.timestamp + 10000000
+            block.timestamp + 10000000,
+            TITLE,
+            DESCRIPTION
         );
 
         address user = makeAddr("user");
@@ -153,7 +187,9 @@ contract CrowdFundUnitTest is Test {
 
         uint256 campaignId = crowdFunding.launch(
             3 ether,
-            block.timestamp + 10000000
+            block.timestamp + 10000000,
+            TITLE,
+            DESCRIPTION
         );
 
         address user = makeAddr("user");
@@ -171,7 +207,9 @@ contract CrowdFundUnitTest is Test {
 
         uint256 campaignId = crowdFunding.launch(
             10 ether,
-            block.timestamp + 10000
+            block.timestamp + 10000,
+            TITLE,
+            DESCRIPTION
         );
 
         vm.expectRevert(ICrowdFunding.CrowdFund__CampaignNotEnded.selector);
@@ -183,7 +221,9 @@ contract CrowdFundUnitTest is Test {
 
         uint256 campaignId = crowdFunding.launch(
             10 ether,
-            block.timestamp + 10000
+            block.timestamp + 10000,
+            TITLE,
+            DESCRIPTION
         );
 
         address user = makeAddr("user");
@@ -204,7 +244,9 @@ contract CrowdFundUnitTest is Test {
 
         uint256 campaignId = crowdFunding.launch(
             10 ether,
-            block.timestamp + 10000
+            block.timestamp + 10000,
+            TITLE,
+            DESCRIPTION
         );
 
         address user = makeAddr("user");
@@ -226,7 +268,9 @@ contract CrowdFundUnitTest is Test {
 
         uint256 campaignId = crowdFunding.launch(
             10 ether,
-            block.timestamp + 10000
+            block.timestamp + 10000,
+            TITLE,
+            DESCRIPTION
         );
 
         address user = makeAddr("user");
@@ -252,7 +296,9 @@ contract CrowdFundUnitTest is Test {
 
         uint256 campaignId = crowdFunding.launch(
             20 ether,
-            block.timestamp + 10000
+            block.timestamp + 10000,
+            TITLE,
+            DESCRIPTION
         );
 
         address user = makeAddr("user");
@@ -275,7 +321,9 @@ contract CrowdFundUnitTest is Test {
 
         uint256 campaignId = crowdFunding.launch(
             20 ether,
-            block.timestamp + 10000
+            block.timestamp + 10000,
+            TITLE,
+            DESCRIPTION
         );
 
         address user = makeAddr("user");
@@ -302,7 +350,9 @@ contract CrowdFundUnitTest is Test {
 
         uint256 campaignId = crowdFunding.launch(
             1 ether,
-            block.timestamp + 20000
+            block.timestamp + 20000,
+            TITLE,
+            DESCRIPTION
         );
 
         address user = makeAddr("user");
@@ -325,7 +375,9 @@ contract CrowdFundUnitTest is Test {
 
         uint256 campaignId = crowdFunding.launch(
             1 ether,
-            block.timestamp + 10000000
+            block.timestamp + 10000000,
+            TITLE,
+            DESCRIPTION
         );
 
         address user = makeAddr("user");
@@ -344,7 +396,9 @@ contract CrowdFundUnitTest is Test {
 
         uint256 campaignId = crowdFunding.launch(
             1 ether,
-            block.timestamp + 10000
+            block.timestamp + 10000,
+            TITLE,
+            DESCRIPTION
         );
 
         address user = makeAddr("user");
@@ -364,7 +418,9 @@ contract CrowdFundUnitTest is Test {
 
         uint256 campaignId = crowdFunding.launch(
             20 ether,
-            block.timestamp + 10000
+            block.timestamp + 10000,
+            TITLE,
+            DESCRIPTION
         );
 
         address user = makeAddr("user");
@@ -389,7 +445,9 @@ contract CrowdFundUnitTest is Test {
 
         uint256 campaignId = crowdFunding.launch(
             1000 ether,
-            block.timestamp + 10000
+            block.timestamp + 10000,
+            TITLE,
+            DESCRIPTION
         );
 
         address user = makeAddr("user");
@@ -417,7 +475,9 @@ contract CrowdFundUnitTest is Test {
 
         uint256 campaignId = crowdFunding.launch(
             1000 ether,
-            block.timestamp + 10000
+            block.timestamp + 10000,
+            TITLE,
+            DESCRIPTION
         );
 
         address user = makeAddr("user");
@@ -440,7 +500,9 @@ contract CrowdFundUnitTest is Test {
 
         uint256 campaignId = crowdFunding.launch(
             1000 ether,
-            block.timestamp + 10000
+            block.timestamp + 10000,
+            TITLE,
+            DESCRIPTION
         );
 
         address user = makeAddr("user");
