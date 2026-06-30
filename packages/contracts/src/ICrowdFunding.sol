@@ -18,6 +18,7 @@ interface ICrowdFunding {
     event LaunchCrowdFund(
         address indexed creator,
         uint256 indexed campaignId,
+        string indexed title,
         uint256 targetAmount
     );
 
@@ -46,6 +47,8 @@ interface ICrowdFunding {
     error CrowdFund__InvalidTargetAmount();
     error CrowdFund__DeadLineMustBeFuture();
     error CrowdFund__MoreThanZeroPledge();
+    error CrowdFund__MustHaveTitle();
+    error CrowdFund__MustHaveDescription();
     error CrowdFund__CampaignExpired();
     error CrowdFund__CampaignNotEnded();
     error CrowdFund__TargetNotMet();
@@ -63,6 +66,8 @@ interface ICrowdFunding {
         uint256 deadLine;
         uint256 currentAmount;
         bool claimed;
+        string title;
+        string description;
     }
 
     /**
@@ -70,7 +75,9 @@ interface ICrowdFunding {
      */
     function launch(
         uint256 targetAmount,
-        uint256 deadLine
+        uint256 deadLine,
+        string memory title,
+        string memory description
     ) external returns (uint256 campaignId);
 
     function pledge(uint256 campaignId) external payable;
